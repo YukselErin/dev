@@ -18,12 +18,12 @@ MODEL = "x-ai/grok-4-fast:free"  # Grok 4 Fast free model
 # Set up Jinja2 environment
 env = Environment(loader=FileSystemLoader(os.path.dirname(__file__)))
 
-st.title("Text Processing App")
+st.title("Robot oluştur.")
 
 # Input text
-input_text = st.text_area("Enter text input:")
+input_text = st.text_area("Oluşturmak istediğiniz robotu tarif ediniz:")
 
-if st.button("Process and Generate Output"):
+if st.button("Oluştur"):
     if input_text:
         # Your Python text processing logic here (customize)
         processed_text = input_text.strip().upper()  # Placeholder
