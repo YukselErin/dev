@@ -3,6 +3,51 @@ import requests
 import json
 from jinja2 import Environment, FileSystemLoader
 import os
+import base64
+
+# GitHub API functions for persistent history
+def load_history():
+    url = f"https://api.github.com/repos/{st.secrets['GITHUB_OWNER']}/{st.secrets['GITHUB_REPO']}/contents/history.json"
+    headers = {
+        "Authorization": f"token {st.secrets['GITHUB_TOKEN']}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    resp = requests.get(url, headers=headers)
+    if resp.status_code == 200:
+        content = base64.b64decode(resp.json()['content']).decode('utf-8')
+        return json.loads(content)
+    else:
+        return []  # File doesn't exist or other error
+
+def save_history(history):
+    url = f"https://api.github.com/repos/{st.secrets['GITHUB_OWNER']}/{st.secrets['GITHUB_REPO']}/contents/history.json"
+    headers = {
+        "Authorization": f"token {st.secrets['GITHUB_TOKEN']}",
+        "Accept": "application/vnd.github.v3+json",
+        "Content-Type": "application/json"
+    }
+    
+    # Get current SHA if file exists
+    resp_get = requests.get(url, headers=headers)
+    sha = resp_get.json()['sha'] if resp_get.status_code == 200 else None
+    
+    new_content = base64.b64encode(json.dumps(history, indent=4).encode('utf-8')).decode('utf-8')
+    data = {
+        "message": "Update LLM history",
+        "content": new_content
+    }
+    if sha:
+        data["sha"] = sha
+    
+    resp = requests.put(url, headers=headers, json=data)
+    if resp.status_code not in (200, 201):
+        st.error(f"Failed to save history: {resp.text}")
+
+# Password protection for privacy
+password = st.text_input("Password", type="password")
+if password != st.secrets["PASSWORD"]:
+    st.warning("Please enter the correct password to access the app.")
+    st.stop()
 
 # Load fixed prompt parts (assumes files in same directory)
 with open('prefix.txt', 'r') as f:
@@ -30,6 +75,8 @@ if 'xml_type' not in st.session_state:
     st.session_state.xml_type = None
 if 'json_list' not in st.session_state:
     st.session_state.json_list = None
+if 'history' not in st.session_state:
+    st.session_state.history = load_history()
 
 if st.button("Oluştur"):
     if input_text:
@@ -53,6 +100,10 @@ if st.button("Oluştur"):
         
         if response.status_code == 200:
             output = response.json()["choices"][0]["message"]["content"].strip()
+            
+            # Save query-answer pair to history
+            st.session_state.history.append({'query': prompt, 'answer': output})
+            save_history(st.session_state.history)
             
             try:
                 # Parse the output as a list of JSON objects
@@ -95,9 +146,23 @@ if st.session_state.xml_robot and st.session_state.xml_type:
         st.info("Additional JSONs found (beyond 2):")
         st.json(st.session_state.json_list[2:])
 
-# Optional: Add a reset button to clear results
+# Display history in an expander
+with st.expander("View LLM Query-Answer History"):
+    for idx, item in enumerate(st.session_state.history):
+        st.subheader(f"Pair {idx + 1}")
+        st.text_area("Query:", value=item['query'], height=100)
+        st.text_area("Answer:", value=item['answer'], height=100)
+
+# Download history as JSON
+if st.session_state.history:
+    history_json = json.dumps(st.session_state.history, indent=4)
+    st.download_button("Download History (JSON)", data=history_json, file_name="llm_history.json", mime="application/json")
+
+# Optional: Add a reset button to clear results and history
 if st.button("Reset"):
     st.session_state.xml_robot = None
     st.session_state.xml_type = None
     st.session_state.json_list = None
+    st.session_state.history = []
+    save_history(st.session_state.history)
     st.rerun()
