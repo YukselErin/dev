@@ -4,17 +4,31 @@ import requests
 # Your OpenRouter API key (store as secret in Streamlit Cloud)
 API_KEY = st.secrets["OPENROUTER_API_KEY"]
 MODEL = "x-ai/grok-4-fast:free"  # Grok 4 Fast free model
+# Load fixed prompt parts (assumes files are in the same directory as app.py)
+with open('prefix.txt', 'r') as f:
+    prefix = f.read()
 
-st.title("Text Processing App")
+with open('suffix.txt', 'r') as f:
+    suffix = f.read()
+st.title("Robot Oluşturucu")
 
 # Input text
-input_text = st.text_area("Enter text input:")
+input_text = st.text_area("Oluşturmak istediğiniz Kofax robotunu tanımlayınız.")
 
-if st.button("Process and Generate Output"):
+if st.button("İşle ve üret"):
     if input_text:
         # Your Python text processing logic here (e.g., clean, extract, build prompt)
         processed_text = input_text.upper()  # Placeholder example
         prompt = f"Based on this text: {processed_text}. Generate a summary."  # Customize prompts
+
+        # Your Python text processing logic here (e.g., clean, extract, transform)
+        processed_text = input_text.strip().upper()  # Placeholder example; customize this
+
+        # Build the full prompt: fixed prefix + dynamic part + fixed suffix
+        prompt = prefix + processed_text + suffix
+
+        
+
 
         # Call OpenRouter API
         headers = {

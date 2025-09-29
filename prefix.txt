@@ -1,0 +1,1 @@
+I have two jinja2 templates, use the first jinja template below by creating a single JSON to create a robot, use the second template that is used for types, to get complex types that can be used in the robot you made, similar to simple types. Here is what the robot should do;
