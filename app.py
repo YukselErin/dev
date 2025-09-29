@@ -1,4 +1,4 @@
-pythonimport streamlit as st
+import streamlit as st
 import requests
 import json
 from jinja2 import Environment, FileSystemLoader
