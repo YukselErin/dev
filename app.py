@@ -1,5 +1,8 @@
-import streamlit as st
+pythonimport streamlit as st
 import requests
+import json
+from jinja2 import Environment, FileSystemLoader
+import os
 
 # Your OpenRouter API key (store as secret in Streamlit Cloud)
 API_KEY = st.secrets["OPENROUTER_API_KEY"]
