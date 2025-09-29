@@ -23,6 +23,14 @@ st.title("Robot oluştur.")
 # Input text
 input_text = st.text_area("Oluşturmak istediğiniz robotu tarif ediniz:")
 
+# Initialize session state if not present
+if 'xml_robot' not in st.session_state:
+    st.session_state.xml_robot = None
+if 'xml_type' not in st.session_state:
+    st.session_state.xml_type = None
+if 'json_list' not in st.session_state:
+    st.session_state.json_list = None
+
 if st.button("Oluştur"):
     if input_text:
         # Your Python text processing logic here (customize)
@@ -55,24 +63,14 @@ if st.button("Oluştur"):
                 else:
                     # Render first JSON to template_robot.j2
                     template_robot = env.get_template('robot_template.j2')
-                    xml_robot = template_robot.render(data=json_list[0])
+                    st.session_state.xml_robot = template_robot.render(data=json_list[0])
                     
                     # Render second JSON to template_type.j2
                     template_type = env.get_template('type_template.j2')
-                    xml_type = template_type.render(data=json_list[1])
+                    st.session_state.xml_type = template_type.render(data=json_list[1])
                     
-                    # Display outputs (optional, for preview)
-                    st.text_area("First XML (.robot):", value=xml_robot, height=200)
-                    st.text_area("Second XML (.type):", value=xml_type, height=200)
-                    
-                    # Download buttons
-                    st.download_button("Download First (.robot)", data=xml_robot, file_name="output.robot", mime="text/xml")
-                    st.download_button("Download Second (.type)", data=xml_type, file_name="output.type", mime="text/xml")
-                
-                # If more than 2, handle extras (e.g., display raw)
-                if len(json_list) > 2:
-                    st.info("Additional JSONs found (beyond 2):")
-                    st.json(json_list[2:])
+                    # Store json_list for extras if needed
+                    st.session_state.json_list = json_list
             
             except json.JSONDecodeError:
                 st.error("Failed to parse LLM output as JSON. Raw output:")
@@ -81,3 +79,25 @@ if st.button("Oluştur"):
             st.error(f"API error: {response.text}")
     else:
         st.warning("Enter some text.")
+
+# Always display results and buttons if available in session state
+if st.session_state.xml_robot and st.session_state.xml_type:
+    # Display outputs (optional, for preview)
+    st.text_area("First XML (.robot):", value=st.session_state.xml_robot, height=200)
+    st.text_area("Second XML (.type):", value=st.session_state.xml_type, height=200)
+    
+    # Download buttons
+    st.download_button("Download First (.robot)", data=st.session_state.xml_robot, file_name="output.robot", mime="text/xml")
+    st.download_button("Download Second (.type)", data=st.session_state.xml_type, file_name="output.type", mime="text/xml")
+    
+    # Handle extras if more than 2
+    if st.session_state.json_list and len(st.session_state.json_list) > 2:
+        st.info("Additional JSONs found (beyond 2):")
+        st.json(st.session_state.json_list[2:])
+
+# Optional: Add a reset button to clear results
+if st.button("Reset"):
+    st.session_state.xml_robot = None
+    st.session_state.xml_type = None
+    st.session_state.json_list = None
+    st.rerun()
