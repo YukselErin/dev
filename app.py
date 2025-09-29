@@ -4,31 +4,33 @@ import json
 from jinja2 import Environment, FileSystemLoader
 import os
 
-# Your OpenRouter API key (store as secret in Streamlit Cloud)
-API_KEY = st.secrets["OPENROUTER_API_KEY"]
-MODEL = "x-ai/grok-4-fast:free"  # Grok 4 Fast free model
-# Load fixed prompt parts (assumes files are in the same directory as app.py)
+# Load fixed prompt parts (assumes files in same directory)
 with open('prefix.txt', 'r') as f:
     prefix = f.read()
 
 with open('suffix.txt', 'r') as f:
     suffix = f.read()
-st.title("Robot Oluşturucu")
+
+# Your OpenRouter API key (store as secret in Streamlit Cloud)
+API_KEY = st.secrets["OPENROUTER_API_KEY"]
+MODEL = "x-ai/grok-4-fast:free"  # Grok 4 Fast free model
+
+# Set up Jinja2 environment
+env = Environment(loader=FileSystemLoader(os.path.dirname(__file__)))
+
+st.title("Text Processing App")
 
 # Input text
-input_text = st.text_area("Oluşturmak istediğiniz Kofax robotunu tanımlayınız.")
+input_text = st.text_area("Enter text input:")
 
-if st.button("İşle ve üret"):
+if st.button("Process and Generate Output"):
     if input_text:
-        # Your Python text processing logic here (e.g., clean, extract, build prompt)
-        processed_text = input_text.upper()  # Placeholder example
-        prompt = f"Based on this text: {processed_text}. Generate a summary."  # Customize prompts
-
-        # Your Python text processing logic here (e.g., clean, extract, transform)
-        processed_text = input_text.strip().upper()  # Placeholder example; customize this
+        # Your Python text processing logic here (customize)
+        processed_text = input_text.strip().upper()  # Placeholder
 
         # Build the full prompt: fixed prefix + dynamic part + fixed suffix
-        prompt = prefix + input_text + "\n\nOutput ONLY a valid JSON array containing the resulting objects (e.g., [{\"key1\": \"value1\"}, {\"key2\": \"value2\"}]). No explanations or extra text. Put the robot JSON first, and the complex type json second."
+        # Append instruction to ensure output is ONLY a JSON array of objects (no other text)
+        prompt = prefix + processed_text + suffix + "\n\nOutput ONLY a valid JSON array containing the resulting objects (e.g., [{\"key1\": \"value1\"}, {\"key2\": \"value2\"}]). No explanations or extra text. Put the robot JSON first, and the complex type json second."
 
         # Call OpenRouter API
         headers = {
@@ -52,11 +54,11 @@ if st.button("İşle ve üret"):
                     st.warning("LLM output parsed, but fewer than 2 JSONs found. Adjust prompt if needed.")
                 else:
                     # Render first JSON to template_robot.j2
-                    template_robot = env.get_template('template_robot.j2')
+                    template_robot = env.get_template('robot_template.j2')
                     xml_robot = template_robot.render(data=json_list[0])
                     
                     # Render second JSON to template_type.j2
-                    template_type = env.get_template('template_type.j2')
+                    template_type = env.get_template('type_template.j2')
                     xml_type = template_type.render(data=json_list[1])
                     
                     # Display outputs (optional, for preview)
