@@ -94,7 +94,7 @@ if st.button("Oluştur"):
         }
         data = {
             "model": MODEL,
-            "reasoning": {"enabled":true},
+            "reasoning": {"enabled":True},
             "messages": [{"role": "user", "content": prompt}]
         }
         response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
@@ -168,4 +168,5 @@ if st.button("Reset"):
     save_history(st.session_state.history)
 
     st.rerun()
+
 
