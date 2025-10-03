@@ -8,6 +8,8 @@ import base64
 # GitHub API functions for persistent history
 def load_history():
     url = f"https://api.github.com/repos/{st.secrets['GITHUB_OWNER']}/{st.secrets['GITHUB_REPO']}/contents/history.json"
+    if 'GITHUB_BRANCH' in st.secrets:
+        url += f"?ref={st.secrets['GITHUB_BRANCH']}"
     headers = {
         "Authorization": f"token {st.secrets['GITHUB_TOKEN']}",
         "Accept": "application/vnd.github.v3+json"
@@ -17,10 +19,13 @@ def load_history():
         content = base64.b64decode(resp.json()['content']).decode('utf-8')
         return json.loads(content)
     else:
+        st.error(f"Load history failed: Status {resp.status_code}, Response: {resp.text}")
         return []  # File doesn't exist or other error
 
 def save_history(history):
     url = f"https://api.github.com/repos/{st.secrets['GITHUB_OWNER']}/{st.secrets['GITHUB_REPO']}/contents/history.json"
+    if 'GITHUB_BRANCH' in st.secrets:
+        url += f"?ref={st.secrets['GITHUB_BRANCH']}"
     headers = {
         "Authorization": f"token {st.secrets['GITHUB_TOKEN']}",
         "Accept": "application/vnd.github.v3+json",
@@ -29,7 +34,12 @@ def save_history(history):
     
     # Get current SHA if file exists
     resp_get = requests.get(url, headers=headers)
-    sha = resp_get.json()['sha'] if resp_get.status_code == 200 else None
+    sha = None
+    if resp_get.status_code == 200:
+        sha = resp_get.json()['sha']
+    elif resp_get.status_code != 404:
+        st.error(f"Get SHA failed: Status {resp_get.status_code}, Response: {resp_get.text}")
+        return
     
     new_content = base64.b64encode(json.dumps(history, indent=4).encode('utf-8')).decode('utf-8')
     data = {
@@ -41,8 +51,11 @@ def save_history(history):
     
     resp = requests.put(url, headers=headers, json=data)
     if resp.status_code not in (200, 201):
-        st.error(f"Failed to save history: {resp.text}")
+        st.error(f"Save history failed: Status {resp.status_code}, Response: {resp.text}")
+    else:
+        st.success("History saved successfully!")
 
+        
 # Password protection for privacy
 password = st.text_input("Password", type="password")
 if password != st.secrets["PASSWORD"]:
