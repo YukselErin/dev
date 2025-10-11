@@ -107,7 +107,7 @@ if st.button("Oluştur"):
 
         # Build the full prompt: fixed prefix + dynamic part + fixed suffix
         # Append instruction to ensure output is ONLY a JSON array of objects (no other text)
-        prompt = prefix +example+ +simpleRobotTemplate+simpleTypeTemplate+"ow, for this description: "+processed_text + suffix   
+        prompt = prefix +example+ simpleRobotTemplate+simpleTypeTemplate+"Now, for this description: "+processed_text + suffix   
 
         # Call OpenRouter API
         headers = {
