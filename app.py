@@ -80,7 +80,7 @@ with open('simpleTypeTemplate.j2', 'r') as f:
 
 # Your OpenRouter API key (store as secret in Streamlit Cloud)
 API_KEY = st.secrets["OPENROUTER_API_KEY"]
-MODEL = "x-ai/grok-4-fast:free"  # Grok 4 Fast free model
+MODEL = "deepseek/deepseek-chat-v3.1:free"  # Grok 4 Fast free model
 
 # Set up Jinja2 environment
 env = Environment(loader=FileSystemLoader(os.path.dirname(__file__)))
