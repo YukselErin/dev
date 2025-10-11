@@ -80,7 +80,7 @@ with open('simpleTypeTemplate.j2', 'r') as f:
 
 # Your OpenRouter API key (store as secret in Streamlit Cloud)
 API_KEY = st.secrets["OPENROUTER_API_KEY"]
-MODEL = "deepseek/deepseek-chat-v3.1:free"  # Grok 4 Fast free model
+MODEL = "tngtech/deepseek-r1t2-chimera:free"  # Grok 4 Fast free model
 
 # Set up Jinja2 environment
 env = Environment(loader=FileSystemLoader(os.path.dirname(__file__)))
@@ -99,7 +99,7 @@ if 'json_list' not in st.session_state:
     st.session_state.json_list = None
 if 'history' not in st.session_state:
     st.session_state.history = load_history()
-    
+
 if st.button("Oluştur"):
     if input_text:
         # Your Python text processing logic here (customize)
