@@ -66,8 +66,17 @@ if password != st.secrets["PASSWORD"]:
 with open('prefix.txt', 'r') as f:
     prefix = f.read()
 
+with open('example.json', 'r') as f:
+    example = f.read()
+
 with open('suffix.txt', 'r') as f:
     suffix = f.read()
+
+with open('simpleRobotTemplate.j2', 'r') as f:
+    simpleRobotTemplate = f.read()
+
+with open('simpleTypeTemplate.j2', 'r') as f:
+    simpleTypeTemplate = f.read()
 
 # Your OpenRouter API key (store as secret in Streamlit Cloud)
 API_KEY = st.secrets["OPENROUTER_API_KEY"]
@@ -98,7 +107,7 @@ if st.button("Oluştur"):
 
         # Build the full prompt: fixed prefix + dynamic part + fixed suffix
         # Append instruction to ensure output is ONLY a JSON array of objects (no other text)
-        prompt = prefix + processed_text + suffix + "\n\nOutput ONLY a valid JSON array containing the resulting objects (e.g., [{\"key1\": \"value1\"}, {\"key2\": \"value2\"}]). No explanations or extra text. Put the robot JSON first, and the complex type json second."
+        prompt = prefix +example+ +simpleRobotTemplate+simpleTypeTemplate+"ow, for this description: "+processed_text + suffix   
 
         # Call OpenRouter API
         headers = {
