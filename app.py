@@ -196,7 +196,7 @@ if st.session_state.xml_robot and st.session_state.xml_type:
 with st.expander("View LLM Query-Answer History"):
     for idx, item in enumerate(st.session_state.history):
         st.subheader(f"Pair {idx + 1}")
-        st.text_area("Query:", value=item['query'], height=100,key=f"answer_{idx}")
+        st.text_area("Query:", value=item['query'], height=100,key=f"query_{idx}")
         st.text_area("Answer:", value=item['answer'], height=100,key=f"answer_{idx}")
 
 # Download history as JSON
