@@ -99,7 +99,7 @@ if 'json_list' not in st.session_state:
     st.session_state.json_list = None
 if 'history' not in st.session_state:
     st.session_state.history = load_history()
-
+    
 if st.button("Oluştur"):
     if input_text:
         # Your Python text processing logic here (customize)
@@ -107,7 +107,7 @@ if st.button("Oluştur"):
 
         # Build the full prompt: fixed prefix + dynamic part + fixed suffix
         # Append instruction to ensure output is ONLY a JSON array of objects (no other text)
-        prompt = prefix +example+ simpleRobotTemplate+simpleTypeTemplate+"Now, for this description: "+processed_text + suffix   
+        prompt = prefix + example + simpleRobotTemplate + simpleTypeTemplate + "Now, for this description: " + processed_text + suffix   
 
         # Call OpenRouter API
         headers = {
@@ -116,18 +116,37 @@ if st.button("Oluştur"):
         }
         data = {
             "model": MODEL,
-            "reasoning": {"enabled":True},
+            "reasoning": {"enabled": True},
             "messages": [{"role": "user", "content": prompt}]
         }
         response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
         
-        if response.status_code == 200:
-            output = response.json()["choices"][0]["message"]["content"].strip()
-            
-            # Save query-answer pair to history
-            st.session_state.history.append({'query': prompt, 'answer': output})
-            save_history(st.session_state.history)
-            
+        # Extract raw response for history/error handling
+        try:
+            response_json = response.json()
+        except json.JSONDecodeError:
+            response_text = response.text  # Fallback if not JSON
+            output = f"Non-JSON response: {response_text}"
+        else:
+            response_text = json.dumps(response_json, indent=2)  # Pretty-print for display
+            if response.status_code != 200:
+                output = f"API error (status {response.status_code}): {response_text}"
+            else:
+                # 200 but check for error body vs. success
+                if "choices" in response_json and len(response_json["choices"]) > 0:
+                    output = response_json["choices"][0]["message"]["content"]
+                else:
+                    # Error embedded in 200 body (no choices)
+                    error_msg = response_json.get("error", {}).get("message", "Unknown error format")
+                    output = f"Unexpected 200 response (possible mid-processing error): {error_msg}\nFull body: {response_text}"
+        
+        # ALWAYS save to history (query + output, whether success or error)
+        st.session_state.history.append({'query': prompt, 'answer': output})
+        save_history(st.session_state.history)
+        
+        # Display output (success or error)
+        if response.status_code == 200 and "choices" in response_json and len(response_json["choices"]) > 0:
+            # Success: Try parsing JSON and rendering
             try:
                 # Parse the output as a list of JSON objects
                 json_list = json.loads(output)
@@ -150,7 +169,11 @@ if st.button("Oluştur"):
                 st.error("Failed to parse LLM output as JSON. Raw output:")
                 st.text(output)
         else:
-            st.error(f"API error: {response.text}")
+            # Non-200 or 200-with-error: Show details
+            st.error(f"API issue:\n{output}")
+            # Optional: Show full response body for debugging (comment out in prod)
+            # with st.expander("Debug: Full Response Body"):
+            #     st.text(response_text)
     else:
         st.warning("Enter some text.")
 
