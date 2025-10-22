@@ -198,8 +198,8 @@ with st.expander("View LLM Query-Answer History"):
      st.subheader(f"Pair {idx + 1}")
         
         # Use .get() to safely access keys, providing a default if missing
-         query_value = item.get('query', 'N/A - Key missing in history')
-         answer_value = item.get('answer', 'N/A - Key missing in history')
+        query_value = item.get('query', 'N/A - Key missing in history')
+        answer_value = item.get('answer', 'N/A - Key missing in history')
         
         st.text_area("Query:", value=query_value, height=100, key=f"query_{idx}")
         st.text_area("Answer:", value=answer_value, height=100, key=f"answer_{idx}")
