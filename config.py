@@ -17,6 +17,8 @@ if is_running_on_streamlit_cloud():
     GITHUB_OWNER = st.secrets.get("GITHUB_OWNER")
     GITHUB_REPO = st.secrets.get("GITHUB_REPO")
     GITHUB_BRANCH = st.secrets.get("GITHUB_BRANCH")
+    GROQ_API_KEY = st.secrets.get("GROQ_API_KEY")
+    GOOGLE_API_KEY = st.secrets.get("GOOGLE_API_KEY")
 else:
     # Load secrets from the local .env file for development
     load_dotenv()
@@ -26,6 +28,22 @@ else:
     GITHUB_OWNER = os.getenv("GITHUB_OWNER")
     GITHUB_REPO = os.getenv("GITHUB_REPO")
     GITHUB_BRANCH = os.getenv("GITHUB_BRANCH")
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
-# You can also define constants here
-MODEL_NAME = "tngtech/deepseek-r1t2-chimera:free"
+# --- MODEL CONFIGURATION ---
+AVAILABLE_MODELS = {
+    "OpenRouter": [
+        "tngtech/deepseek-r1t2-chimera:free",
+        "google/gemma-7b-it:free",
+        "huggingfaceh4/zephyr-7b-beta:free",
+    ],
+    "Groq": [
+        "llama3-8b-8192",
+        "gemma-7b-it",
+        "mixtral-8x7b-32768"
+    ],
+    "Google": [
+        "gemini-2.5-flash"
+    ]
+}

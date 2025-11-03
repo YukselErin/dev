@@ -3,9 +3,9 @@ import requests
 import json
 import base64
 
-def load_history(owner, repo, token, branch=None):
-    """Loads history from GitHub, returns a list."""
-    url = f"https://api.github.com/repos/{owner}/{repo}/contents/history.json"
+def load_history(owner, repo, token, branch=None, file_path='history.json'):
+    """Loads history from a specific file on GitHub, returns a list or an error message string."""
+    url = f"https://api.github.com/repos/{owner}/{repo}/contents/{file_path}"
     if branch:
         url += f"?ref={branch}"
     headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"}
@@ -18,15 +18,13 @@ def load_history(owner, repo, token, branch=None):
         elif resp.status_code == 404:
             return []  # File doesn't exist yet, return empty history
         else:
-            print(f"Error loading history: {resp.status_code} - {resp.text}")
-            return None # Indicate an error
+            return f"Error loading history from {file_path}: {resp.status_code} - {resp.text}"
     except Exception as e:
-        print(f"An exception occurred while loading history: {e}")
-        return None
+        return f"An exception occurred while loading history from {file_path}: {e}"
 
-def save_history(history, owner, repo, token, branch=None):
-    """Saves history to GitHub, returns True on success, False on failure."""
-    url = f"https://api.github.com/repos/{owner}/{repo}/contents/history.json"
+def save_history(history, owner, repo, token, branch=None, file_path='history.json'):
+    """Saves history to a specific file on GitHub, returns True on success, or an error message string on failure."""
+    url = f"https://api.github.com/repos/{owner}/{repo}/contents/{file_path}"
     if branch:
         url += f"?ref={branch}"
     headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"}
@@ -37,8 +35,9 @@ def save_history(history, owner, repo, token, branch=None):
         sha = resp_get.json().get('sha') if resp_get.status_code == 200 else None
 
         # Prepare payload
+        message = f"Update history for {file_path}"
         new_content = base64.b64encode(json.dumps(history, indent=4).encode('utf-8')).decode('utf-8')
-        data = {"message": "Update LLM history", "content": new_content}
+        data = {"message": message, "content": new_content}
         if sha:
             data["sha"] = sha
         
@@ -47,8 +46,6 @@ def save_history(history, owner, repo, token, branch=None):
         if resp_put.status_code in (200, 201):
             return True
         else:
-            print(f"Error saving history: {resp_put.status_code} - {resp_put.text}")
-            return False
+            return f"Error saving history to {file_path}: {resp_put.status_code} - {resp_put.text}. URL: {url}, SHA: {sha}"
     except Exception as e:
-        print(f"An exception occurred while saving history: {e}")
-        return False
+        return f"An exception occurred while saving history to {file_path}: {e}"

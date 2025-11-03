@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<object class="RobotClip">
+  <roboSuiteVersion class="Version">11.3.0.1</roboSuiteVersion>
+  <browserEngineType class="com.kapowtech.robot.summary.BrowserEngineType">
+    <property name="enum-name" class="String">WEBKIT</property>
+  </browserEngineType>
+  <blockBeginStep class="BlockBeginStep" id="0"/>
+      <steps class="ArrayList"> {% for step in steps %} 
+
+      <-!STEPACTION-1!->
+      {% if step.step_action is defined and step.step_action.class == "AssignVariable" %}
+<object class="Transition" serializationversion="3" id="{{ step.id }}">
+  <property name="name" class="String">{{ step.name }}</property>
+  <property name="stepAction" class="AssignVariable" serializationversion="4">
+    {# --- target variable (where we write the result) --- #}
+    <property name="variable" class="kapow.robot.plugin.common.support.AttributeName2">
+      {% if step.step_action.output is defined %}
+        {# assume output contains an idref index (numeric or token) #}
+        <property name="name" idref="{{ 
+step.step_action.output }}"/>
+      {% elif step.step_action.output_name is defined %}
+        {# fallback to name text if idref not available #}
+        <property name="name" class="String">{{ step.step_action.output_name }}</property>
+      {% else %}
+        {# fallback to a variable object if provided #}
+        {% if step.step_action.variable is defined %}
+          {% if step.step_action.variable.idref is defined %}
+       
+     <property name="name" idref="{{ step.step_action.variable.idref }}"/>
+          {% elif step.step_action.variable.name is defined %}
+            <property name="name" class="String">{{ step.step_action.variable.name }}</property>
+          {% endif %}
+        {% endif %}
+      {% endif %}
+    </property>
+
+    {# --- the expression/value to assign --- #}
+    {% if step.step_action.assignment_type == "expression" %}
+      
+<property name="stringExpr" class="Expression" serializationversion="1">
+        {# IMPORTANT: write the expression text directly (no Jinja curly braces) #}
+        <property name="text" class="String">{{ step.step_action.value }}</property>
+      </property>
+    {% elif step.step_action.assignment_type == "value" %}
+      <property name="stringExpr" class="kapow.robot.plugin.common.support.expression.stringexpr.ValueStringExpression">
+        <property name="text" class="String">{{ step.step_action.value }}</property>
+      </property>
+    {% elif step.step_action.assignment_type == "converters" %}
+      <property name="stringExpr" class="kapow.robot.plugin.common.support.expression.multipletype.StringProcessorsExpression">
+        
+<property name="dataConverters" class="DataConverters">
+          {% for converter in converters %}
+            {{ converter(converter.type, converter.value) }}
+          {% endfor %}
+        </property>
+      </property>
+    {% endif %}
+  </property>
+
+  <property name="elementFinders" class="ElementFinders" />
+  <property name="errorHandler" class="ErrorHandler" serializationversion="0" />
+  <property name="comment"><null/></property>
+  <property name="enabled" class="Boolean">{{ step.enabled }}</property>
+  <property name="changedProperties" class="java.util.HashSet" />
+</object>
+{% endif %}
+
+      <-!STEPACTION-2!->
+      {% 
+if step.class == "End" %} <object class="End" id="{{ step.id }}" /> {% endif %} 
+
+      <-!STEPACTION-3!->
+      {% if
+      step.step_action is defined and step.step_action.class == "OpenVariable" %} <object
+        class="Transition" serializationversion="3" id="{{ step.id }}">
+        <property name="name" class="String">{{ step.name }}</property>
+            <property
+          name="stepAction"
+          class="OpenVariable">
+          <property name="variable"
+    
+        class="kapow.robot.plugin.common.support.AttributeName2"> {% if
+      step.step_action.variable.idref %} <property name="name"
+              idref="{{ step.step_action.variable.idref }}" /> {% else %} <property
+              name="name"
+              class="String">{{ step.step_action.variable.name }}</property> {% endif %} </property>
+        </property>
+            <property
+      
+    name="elementFinders" class="ElementFinders" />
+            <property name="errorHandler"
+          class="ErrorHandler" serializationversion="0" />
+            <property name="comment">
+          <null />
+        </property> {% if step.enabled_idref %} <property
+          name="enabled"
+          idref="{{ step.enabled_idref }}" /> {% else %} <property name="enabled"
+    
+      class="Boolean">{{
+          step.enabled }}</property> {% endif %} <property name="changedProperties"
+          class="java.util.HashSet" />
+      </object> {% endif %} 
+
+      <-!STEPACTION-4!->
+      {% if step.step_action is defined
+      and step.step_action.class == "CallRobot2Step" %} <object
+        class="Transition"
+        serializationversion="3" id="{{ step.id }}">
+        <property name="name" class="String">{{ step.name }}</property>
+           
+ <property
+          name="stepAction"
+          class="CallRobot2Step" serializationversion="0">
+          <property name="robot2Name" class="String">{{ step.step_action.robot2_name }}</property>
+          <property name="returnVariables" class="ReturnVariableBeanList"> {% for rv in
+      step.step_action.return_variables %} <object
+              class="kapow.robot.plugin.common.stepaction.rl2.ReturnVariable">
+              <property name="attributeName"
+           
+     class="kapow.robot.plugin.common.support.AttributeName2"> {% if rv.idref %} <property
+                  name="name" idref="{{ rv.idref }}" /> {% else %} <property
+                  name="name"
+                  class="String">{{ rv.name }}</property> {% endif %} </property>
+            </object>
+      {% endfor %} </property>
+ 
+       </property>
+            <property name="elementFinders"
+          class="ElementFinders" /> {% if step.error_handler %} <property
+          name="errorHandler" class="ErrorHandler"
+          serializationversion="0">
+
+          <property name="reportingViaAPI" class="Boolean">{{
+            step.error_handler.reporting_via_api |
+default(false) | lower }}</property>
+            <property name="reportingViaLog"
+            class="Boolean">{{
+            step.error_handler.reporting_via_log | default(false) | lower }}</property> 
+            {% if step.error_handler.control_flow %} 
+            <property name="controlFlow" class="{{ step.error_handler.control_flow }}" /> 
+            {% endif %} </property> 
+            {% endif %} <property
+          name="comment"
+          class="String">{% if step.comment is not none %} {{step.comment }} {% else %} <null /> {%
+      endif %} </property> {% if step.enabled_idref %} <property name="enabled"
+          idref="{{ step.enabled_idref }}" /> {% 
+else %} <property
+          name="enabled" class="Boolean">{{ step.enabled |
+lower }}</property> {% endif %} <property
+          name="changedProperties" class="java.util.HashSet" />
+      </object> {% endif %} 
+
+      <-!STEPACTION-5!->
+      {% if
+      step.step_action is defined and step.step_action.class == "ExtractCell" %} <object
+        class="Transition" serializationversion="3" id="{{ step.id }}">
+        <property name="name" class="String">{{ step.name }}</property>
+        <property name="stepAction" class="ExtractCell" />
+        <property name="elementFinders" class="ElementFinders">
+          <object class="ExcelElementFinder"> {% 
+if step.element_finders.type == "specified_range"
+      %} <property name="detail" class="SpecifiedRangeCellFinderDetail">
+              <property name="range"
+                class="kapow.robot.plugin.common.support.expression.stringexpr.ValueStringExpression">
+                <property name="value" class="String">{{ step.element_finders.range
+                  }}</property>
+              </property>
+      
+        <property name="usage" class="CellFromRange"> {% if step.element_finders.column_type
+      == "by_index" %} <property name="columnId"
+                  class="ByIndexExcelColumnId">
+                  <property name="offset"
+                    class="kapow.robot.plugin.common.support.expression.integerexpr.ValueIntegerExpression">
+                    
+<property name="value" class="Integer">{{
+                      step.element_finders.column_value }}</property>
+                  </property>
+                </property>
+      {% elif step.element_finders.column_type == "by_header" %} <property name="columnId"
+                  class="ByHeaderExcelColumnId">
+          
+        <property name="headerPattern"
+                    class="kapow.robot.plugin.common.support.expression.stringexpr.PatternValueStringExpression">
+                    <property name="value" class="String">{{
+                      step.element_finders.column_value }}</property>
+                  </property>
+        
+        </property>
+      {% endif %} {% if step.element_finders.row_type == "by_index" %} <property name="rowId"
+                  class="ByIndexExcelRowId">
+                  <property name="offset"
+                    class="kapow.robot.plugin.common.support.expression.integerexpr.ValueIntegerExpression">
+                   
+ <property name="value" class="Integer">{{
+                      step.element_finders.row_value }}</property>
+                  </property>
+                </property>
+      {% elif step.element_finders.row_type == "by_header" %} <property name="rowId"
+                  class="ByHeaderExcelRowId">
+         
+         <property name="headerPattern"
+                    class="kapow.robot.plugin.common.support.expression.stringexpr.PatternValueStringExpression">
+                    <property name="value" class="String">{{
+                      step.element_finders.row_value }}</property>
+                  </property> {%
+      
+if step.element_finders.row_range_name %} <property name="headerRangeName"
+                    class="ElementName">
+                    <property name="name" class="String">{{
+                      step.element_finders.row_range_name }}</property>
+                  </property>
+      {% endif %} </property> {% endif %} 
+</property>
+            </property> {% elif
+      step.element_finders.type == "named_range" %} <property name="detail"
+              class="NamedRangeCellFinderDetail"> {% if step.element_finders.range_name %} <property
+                name="rangeName" class="ElementName">
+                <property name="name" class="String">{{
+                  step.element_finders.range_name }}</property>
+  
+            </property> {% endif %} <property
+                name="usage" class="CellFromRange"> {% if step.element_finders.column_type ==
+      "by_index" %} <property name="columnId"
+                  class="ByIndexExcelColumnId">
+                  <property name="offset"
+                 
+   class="kapow.robot.plugin.common.support.expression.integerexpr.ValueIntegerExpression">
+                    <property name="value" class="Integer">{{
+                      step.element_finders.column_value }}</property>
+                  </property>
+                </property>
+      {% elif step.element_finders.column_type == "by_header" %} <property name="columnId"
+     
+             class="ByHeaderExcelColumnId">
+                  <property name="headerPattern"
+                    class="kapow.robot.plugin.common.support.expression.stringexpr.PatternValueStringExpression">
+                    <property name="value" class="String">{{
+                      step.element_finders.column_value }}</property>
+   
+               </property>
+                </property>
+      {% endif %} {% if step.element_finders.row_type == "by_index" %} <property name="rowId"
+                  class="ByIndexExcelRowId">
+                  <property name="offset"
+                
+    class="kapow.robot.plugin.common.support.expression.integerexpr.ValueIntegerExpression">
+                    <property name="value" class="Integer">{{
+                      step.element_finders.row_value }}</property>
+                  </property>
+                </property>
+      {% elif step.element_finders.row_type == "by_header" %} <property name="rowId"
+    
+              class="ByHeaderExcelRowId">
+                  <property name="headerPattern"
+                    class="kapow.robot.plugin.common.support.expression.stringexpr.PatternValueStringExpression">
+                    <property name="value" class="String">{{
+                      step.element_finders.row_value }}</property>
+  
+                </property> {%
+      if step.element_finders.row_range_name %} <property name="headerRangeName"
+                    class="ElementName">
+                    <property name="name" class="String">{{
+                      step.element_finders.row_range_name }}</property>
+        
+          </property>
+      {% endif %} </property> {% endif %} </property>
+            </property> {% endif %} </object>
+        </property>
+
+        <property name="errorHandler" class="ErrorHandler" serializationversion="0" />
+        <property name="comment">
+          <null />
+        </property>
+        <property name="enabled" class="Boolean">{{ step.enabled |
+lower }}</property>
+        <property name="changedProperties" class="java.util.HashSet" />
+      </object> {% endif %}
+      
+      <-!STEPACTION-6!->
+      {% if step.step_action is defined and step.step_action.class == "LoopInExcel" %} <object
+class="Transition" serializationversion="3" id="{{ step.id }}">
+<property name="name" class="String">{{ step.name }}</property>
+<property name="stepAction" class="LoopInExcel">
+<property name="loopDirection" class="LoopInExcel$LoopDirection">
+<property name="enum-name" class="String">ROWS</property>
+</property>
+</property>
+<property name="elementFinders" class="ElementFinders">
+<object class="ExcelElementFinder"> {% if step.element_finders.type == "specified_range"
+%} <property name="detail" class="SpecifiedRangeCellFinderDetail">
+<property name="range"
+class="kapow.robot.plugin.common.support.expression.stringexpr.ValueStringExpression">
+<property name="value" class="String">{{ step.element_finders.range
+}}</property>
+</property>
+<property name="usage" class="RowFromRange">
+<property name="rowId" class="ByIndexExcelRowId">
+<property name="offset" class="kapow.robot.plugin.common.support.expression.integerexpr.ValueIntegerExpression">
+<property name="value" class="Integer">{{ step.element_finders.offset |
+default('0') }}</property>
+</property>
+</property>
+</property>
+</property>
+{% elif step.element_finders.type == "named_range" %} <property name="detail"
+class="NamedRangeCellFinderDetail"> {% if step.element_finders.range_name %} <property
+name="rangeName" class="ElementName">
+<property name="name" class="String">{{
+step.element_finders.range_name }}</property>
+</property> {% endif %} <property
+name="usage" class="{{ step.element_finders.usage }}">{% if step.element_finders.usage == "RowFromRange" %}
+<property name="rowId" class="ByIndexExcelRowId">
+<property name="offset" class="kapow.robot.plugin.common.support.expression.integerexpr.ValueIntegerExpression">
+<property name="value" class="Integer">{{ step.element_finders.offset |
+default('0') }}</property>
+</property>
+</property>
+</property>{% endif %}</property>
+</property> {%
+endif %} </object>
+</property>
+<property name="errorHandler" class="ErrorHandler" serializationversion="0" />
+<property name="comment">
+<null />
+</property>
+<property name="enabled" class="Boolean">{{ step.enabled |
+lower }}</property>
+<property name="changedProperties" class="java.util.HashSet" />
+</object> {% endif %}
+      
+      <-!STEPACTION-7!->
+      {% if step.class == "Try" %} <object class="Try" id="{{ step.id }}">
+        <property name="name" class="String">{{ step.name }}</property>
+        <property name="comment" class="String">{{ step.comment }}</property>
+      </object> {%
+      endif %} 
+
+      <-!STEPACTION-8!->
+      {% if step.class == "BranchPoint" %} <object class="BranchPoint"
+        id="{{ step.id }}" /> {% endif %} 
+      
+      <-!STEPACTION-9!->
+      {% if step.step_action is defined and
+      step.step_action.class == "QueryDatabase2" %} <object 
+class="Transition"
+        serializationversion="3" id="{{ step.id }}">
+        <property name="name" class="String">{{ step.name }}</property>
+        <property name="stepAction" class="QueryDatabase2" serializationversion="2">
+          <property name="databaseName"
+            class="kapow.robot.plugin.common.support.expression.stringexpr.DBNameValueStringExpression">
+            <property name="value" class="kapow.util.db.DBName"> {% if
+      step.step_action.database.idref %} <property name="name"
+                idref="{{ step.step_action.database.idref 
+}}" /> {% else %} <property
+                name="name"
+                class="String">{{ step.step_action.database.name }}</property> {% endif %} </property>
+          </property>
+          <property name="sql" class="String">{{ step.step_action.sql }}</property>
+          <property name="columnAttributeMappings"
+            class="kapow.robot.plugin.common.support.database.ColumnAttributeMappings"> {% for
+      mapping in 
+step.step_action.mappings %} <object
+              class="kapow.robot.plugin.common.support.database.ColumnAttributeMapping">
+              <property name="columnName" class="String">{{ mapping.column }}</property>
+              <property name="attributeName"
+                class="kapow.robot.plugin.common.support.AttributeName2"> {% if mapping.idref %} <property
+                  name="name" idref="{{ mapping.idref }}" /> {% else %} <property
+    
+              name="name"
+                  class="String">{{ mapping.name }}</property> {% endif %} </property>
+            </object>
+      {% endfor %} </property>
+        </property>
+        <property name="elementFinders" class="ElementFinders" />
+        <property name="errorHandler" class="ErrorHandler" serializationversion="0">
+          <property 
+name="changedProperties" class="java.util.HashSet">
+            <element class="String">reportingViaAPI</element>
+            <element class="String">reportingViaLog</element>
+          </property>
+          <property name="reportingViaAPI" class="Boolean">false</property>
+          <property name="reportingViaLog" class="Boolean">false</property>
+        </property>
+        <property name="comment">
+          <null />
+        </property>
+   
+     <property name="enabled" class="Boolean">true</property>
+        <property name="changedProperties" class="java.util.HashSet" />
+      </object> {% endif %}
+      
+      <-!STEPACTION-10!->
+      {% if step.step_action is defined and step.step_action.class == "LoadFile" %} <object
+        class="Transition" serializationversion="3" id="{{ step.id }}">
+        <property name="stepAction" class="LoadFile">
+          <property name="fileNameExpression"
+            class="kapow.robot.plugin.common.support.expression.multipletype.VariableExpression"
+            
+serializationversion="2">
+            <property name="variable"
+              class="kapow.robot.plugin.common.support.AttributeName2">
+              <property name="name" class="String">{{
+                step.step_action.fileNameExpression }}</property>
+            </property>
+          </property>
+          <property name="output"
+       
+     class="kapow.robot.plugin.common.stateprocessor.rest.ToVariableOutputSpecification"
+            serializationversion="1">
+            <property name="variable"
+              class="kapow.robot.plugin.common.support.AttributeName2">
+              <property name="name" class="String">{{ step.step_action.output }}</property>
+            </property>
+          </property>
+          <property name="browserConfigurationSpecification"
+     
+       class="BrowserConfigurationSpecificationWebKit" serializationversion="27">
+            <property name="ancestorProvider"
+              class="BrowserConfigurationSpecificationAncestorProviderForStep" />
+          </property>
+        </property>
+      </object>
+      {% endif %} {% endfor %} </steps>
+  <blockEndStep class="BlockEndStep" id="{{ transitions|length + 1 }}"/>
+  <edges class="ArrayList">
+    {# Edge from blockBeginStep to the first transition #}
+    <object class="TransitionEdge">
+      <from idref="0"/>
+      <to idref="{{ transitions[0].id }}"/>
+      <name/>
+      <comment/>
+    </object>
+    {# Edges between transitions #}
+    {% for i in range(transitions|length - 1) %}
+    <object class="TransitionEdge">
+      <from idref="{{ transitions[i].id }}"/>
+      <to idref="{{ transitions[i+1].id }}"/>
+      <name/>
+      <comment/>
+    </object>
+    {% endfor %}
+    {# Edge from the last transition to blockEndStep #}
+    <object class="TransitionEdge">
+      <from idref="{{ transitions[-1].id }}"/>
+      <to idref="{{ transitions|length + 1 }}"/>
+      <name/>
+      <comment/>
+    </object>
+  </edges>
+</object>

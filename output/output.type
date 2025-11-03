@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<object class="kapow.robot.common.domain.Type" serializationversion="0">
+	<prologue>
+		<saved-by-versions>
+			<version>11.4.0.4</version>
+		</saved-by-versions>
+		<file-type>type</file-type>
+	</prologue>
+	<property name="attributes" class="kapow.robot.common.domain.Attributes">
+
+    
+
+
+    <object class="kapow.robot.common.domain.Attribute" serializationversion="1">
+      <property name="name" class="String"><<+removeSpaces(Settings.CurrentColumnName)+>></property>
+      <property name="type" idref="0"/>
+      <property name="recordFieldType" idref="1"/>
+    </object>
+
+        </property>
+</object>

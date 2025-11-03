@@ -1,0 +1,42 @@
+2025-10-16 21:10:48.229167: Starting robot analysis.
+2025-10-16 21:10:48.229802: Found 6 transitions and 6 edges.
+2025-10-16 21:10:48.230056: Divided transitions into 2 chunks.
+2025-10-16 21:10:48.230576: Sending prompt for chunk 1 to LLM.
+2025-10-16 21:11:21.641043: Received summary for chunk 1.
+2025-10-16 21:11:21.641541: Sending prompt for chunk 2 to LLM.
+2025-10-16 21:11:46.548293: Received summary for chunk 2.
+2025-10-16 21:11:46.548594: Combining summaries to get a final summary.
+2025-10-16 21:12:12.553965: Robot analysis complete.
+2025-10-16 21:12:18.797954: Starting robot analysis.
+2025-10-16 21:12:18.798627: Found 6 transitions and 6 edges.
+2025-10-16 21:12:18.798859: Divided transitions into 2 chunks.
+2025-10-16 21:12:18.799391: Sending prompt for chunk 1 to LLM.
+2025-10-16 21:12:50.986905: Received summary for chunk 1.
+2025-10-16 21:12:50.987471: Sending prompt for chunk 2 to LLM.
+2025-10-16 21:13:17.186777: Received summary for chunk 2.
+2025-10-16 21:13:17.187130: Combining summaries to get a final summary.
+2025-10-16 21:13:39.922917: Robot analysis complete.
+2025-10-28 22:57:01.299355: Summarizing robot...
+2025-10-28 22:57:01.719446: Error from LLM when summarizing robot: Network or API Error: 400 Client Error: Bad Request for url: https://api.groq.com/openai/v1/chat/completions
+2025-10-28 22:57:01.719747: Summarizing robot...
+2025-10-28 22:57:02.050823: Error from LLM when summarizing robot: Network or API Error: 400 Client Error: Bad Request for url: https://api.groq.com/openai/v1/chat/completions
+2025-10-28 22:57:27.844043: Summarizing robot...
+2025-10-28 22:57:28.159106: Error from LLM when summarizing robot: Network or API Error: 400 Client Error: Bad Request for url: https://api.groq.com/openai/v1/chat/completions
+2025-10-28 22:57:28.159503: Summarizing robot...
+2025-10-28 22:57:28.473720: Error from LLM when summarizing robot: Network or API Error: 400 Client Error: Bad Request for url: https://api.groq.com/openai/v1/chat/completions
+2025-10-28 22:59:17.900649: Summarizing robot...
+2025-10-28 22:59:18.356024: Error from LLM when summarizing robot: Network or API Error: 400 Client Error: Bad Request for url: https://api.groq.com/openai/v1/chat/completions
+2025-10-28 23:00:50.259521: Summarizing robot...
+2025-10-28 23:00:50.659940: Error from LLM when summarizing robot: Network or API Error: 400 Client Error: Bad Request for url: https://api.groq.com/openai/v1/chat/completions
+2025-10-28 23:02:05.860049: Summarizing robot...
+2025-10-28 23:02:06.349194: Error from LLM when summarizing robot: Network or API Error: 400 Client Error: Bad Request for url: https://api.groq.com/openai/v1/chat/completions
+2025-10-28 23:04:09.034847: Summarizing robot...
+2025-10-28 23:04:20.379204: Received summary from LLM.
+2025-10-28 23:08:40.002288: Summarizing robot...
+2025-10-28 23:08:53.591683: Received summary from LLM.
+2025-10-28 23:14:31.864884: Summarizing robot...
+2025-10-28 23:14:32.727128: Error from LLM when summarizing robot: Network or API Error: 404 Client Error: Not Found for url: https://openrouter.ai/api/v1/chat/completions
+2025-10-28 23:14:51.839721: Summarizing robot...
+2025-10-28 23:14:52.299886: Error from LLM when summarizing robot: Network or API Error: 400 Client Error: Bad Request for url: https://api.groq.com/openai/v1/chat/completions
+2025-10-28 23:15:01.220042: Summarizing robot...
+2025-10-28 23:15:01.523503: Error from LLM when summarizing robot: Network or API Error: 400 Client Error: Bad Request for url: https://api.groq.com/openai/v1/chat/completions

@@ -1,0 +1,126 @@
+[
+    {
+        "variables": [
+            {
+                "id": 1,
+                "name": "A",
+                "type_id": 12,
+                "is_complex": false
+            },
+            {
+                "id": 2,
+                "name": "ExcelVar",
+                "type_id": 150,
+                "is_complex": false
+            },
+            {
+                "id": 3,
+                "name": "Column1Data",
+                "type_id": 12,
+                "is_complex": false
+            },
+            {
+                "id": 4,
+                "name": "Column7Data",
+                "type_id": 12,
+                "is_complex": false
+            }
+        ],
+        "complexVariables": [],
+        "steps": [
+            {
+                "id": 1,
+                "name": "Load Excel File",
+                "step_action": {
+                    "class": "LoadFile",
+                    "fileNameExpression": "A",
+                    "output": "ExcelVar"
+                },
+                "enabled": true
+            },
+            {
+                "id": 2,
+                "name": "Open Excel Variable",
+                "step_action": {
+                    "class": "OpenVariable",
+                    "variable": {
+                        "name": "ExcelVar"
+                    }
+                },
+                "enabled": true
+            },
+            {
+                "id": 3,
+                "name": "Extract Column 1",
+                "step_action": {
+                    "class": "ExtractCell",
+                    "element_finders": {
+                        "type": "specified_range",
+                        "row_type": "by_index",
+                        "row_value": 1,
+                        "column_type": "by_index",
+                        "column_value": 0
+                    }
+                },
+                "output_variable": "Column1Data",
+                "enabled": true
+            },
+            {
+                "id": 4,
+                "name": "Extract Column 7",
+                "step_action": {
+                    "class": "ExtractCell",
+                    "element_finders": {
+                        "type": "specified_range",
+                        "row_type": "by_index",
+                        "row_value": 1,
+                        "column_type": "by_index",
+                        "column_value": 6
+                    }
+                },
+                "output_variable": "Column7Data",
+                "enabled": true
+            },
+            {
+                "id": 5,
+                "name": "Save to Database",
+                "step_action": {
+                    "class": "QueryDatabase2",
+                    "sql": "INSERT INTO Table (Col1, Col7) VALUES (?, ?)",
+                    "mappings": [
+                        {
+                            "column": 1,
+                            "name": "Column1Data"
+                        },
+                        {
+                            "column": 2,
+                            "name": "Column7Data"
+                        }
+                    ]
+                },
+                "enabled": true
+            }
+        ],
+        "edges": [
+            {
+                "from": 1,
+                "to": 2
+            },
+            {
+                "from": 2,
+                "to": 3
+            },
+            {
+                "from": 3,
+                "to": 4
+            },
+            {
+                "from": 4,
+                "to": 5
+            }
+        ]
+    },
+    {
+        "varTypes": []
+    }
+]
